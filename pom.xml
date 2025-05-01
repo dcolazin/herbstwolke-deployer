@@ -52,7 +52,7 @@
 	</developers>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<java.version>1.8</java.version>
+		<java.version>17</java.version>
 		<maven.version>3.6.2</maven.version>
 		<maven-resolver.version>1.4.1</maven-resolver.version>
 		<maven-wagon.version>3.5.2</maven-wagon.version>
@@ -61,8 +61,7 @@
 		<kubernetes-fabric8-client.version>5.12.4</kubernetes-fabric8-client.version>
 		<spring-boot.version>2.7.18</spring-boot.version>
 		<spring-framework.version>5.3.39</spring-framework.version>
-		<maven.compiler.source>${java.version}</maven.compiler.source>
-		<maven.compiler.target>${java.version}</maven.compiler.target>
+		<maven.compiler.release>${java.version}</maven.compiler.release>
 		<logback.version>1.2.13</logback.version>
 		<json-path.version>2.9.0</json-path.version>
 		<okio.version>3.4.0</okio.version>
@@ -277,8 +276,7 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.0</version>
 				<configuration>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
+					<release>${java.version}</release>
 				</configuration>
 			</plugin>
 			<plugin>

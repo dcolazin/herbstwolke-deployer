@@ -77,8 +77,8 @@ public class LocalDeployerProperties {
 
 	/**
 	 * Remote debugging property allowing one to specify the address for the remote debug
-	 * session. On Java versions 1.8 or older use the <em>port</em> format. On Java versions 1.9 or greater use the
-	 * <em>host:port</em> format. The host could default to <em>*</em>. May be set for individual applications (<em>i.e.</em>
+	 * session. Use the <em>host:port</em> format. The host could default to <em>*</em>.
+	 * May be set for individual applications (<em>i.e.</em>
 	 * {@literal deployer.<app-name>.local.debugAddress=*:9999}).
 	 */
 	public static final String DEBUG_ADDRESS = PREFIX + ".debug-address";
