@@ -2,9 +2,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>spring-cloud-deployer-parent</artifactId>
-	<version>2.9.5</version>
-	<groupId>org.springframework.cloud</groupId>
+	<artifactId>herbstwolke-deployer-parent</artifactId>
+	<version>0.1.0-SNAPSHOT</version>
+	<groupId>org.vetronauta</groupId>
 	<packaging>pom</packaging>
 
 	<name>Spring Cloud Deployer</name>
@@ -13,7 +13,7 @@
 		<name>Pivotal Software, Inc.</name>
 		<url>https://www.spring.io</url>
 	</organization>
-	<url>https://github.com/spring-cloud/spring-cloud-deployer</url>
+	<url>https://github.com/spring-cloud/herbstwolke-deployer</url>
 	<licenses>
 		<license>
 			<name>Apache License, Version 2.0</name>
@@ -38,16 +38,16 @@
 		</license>
 	</licenses>
 	<scm>
-		<url>https://github.com/spring-cloud/spring-cloud-deployer</url>
-		<connection>scm:git:git://github.com/spring-cloud/spring-cloud-deployer.git</connection>
-		<developerConnection>scm:git:ssh://git@github.com/spring-cloud/spring-cloud-deployer.git</developerConnection>
+		<url>https://github.com/spring-cloud/herbstwolke-deployer</url>
+		<connection>scm:git:git://github.com/spring-cloud/herbstwolke-deployer.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/spring-cloud/herbstwolke-deployer.git</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
 	<developers>
 		<developer>
 			<id>scdf-team</id>
 			<name>Data Flow Team</name>
-			<organizationUrl>https://github.com/spring-cloud/spring-cloud-deployer/graphs/contributors</organizationUrl>
+			<organizationUrl>https://github.com/spring-cloud/herbstwolke-deployer/graphs/contributors</organizationUrl>
 		</developer>
 	</developers>
 	<properties>
@@ -70,18 +70,18 @@
 	</properties>
 
 	<modules>
-		<module>spring-cloud-deployer-spi</module>
-		<module>spring-cloud-deployer-resource-docker</module>
-		<module>spring-cloud-deployer-resource-maven</module>
-		<module>spring-cloud-deployer-spi-test</module>
-		<module>spring-cloud-deployer-resource-support</module>
-		<module>spring-cloud-deployer-spi-test-app</module>
-		<module>spring-cloud-deployer-spi-scheduler-test-app</module>
-		<module>spring-cloud-deployer-autoconfigure</module>
-		<module>spring-cloud-deployer-dependencies</module>
-		<module>spring-cloud-deployer-local</module>
-		<module>spring-cloud-deployer-kubernetes</module>
-		<module>spring-cloud-deployer-cloudfoundry</module>
+		<module>herbstwolke-deployer-spi</module>
+		<module>herbstwolke-deployer-resource-docker</module>
+		<module>herbstwolke-deployer-resource-maven</module>
+		<module>herbstwolke-deployer-spi-test</module>
+		<module>herbstwolke-deployer-resource-support</module>
+		<module>herbstwolke-deployer-spi-test-app</module>
+		<module>herbstwolke-deployer-spi-scheduler-test-app</module>
+		<module>herbstwolke-deployer-autoconfigure</module>
+		<module>herbstwolke-deployer-dependencies</module>
+		<module>herbstwolke-deployer-local</module>
+		<module>herbstwolke-deployer-kubernetes</module>
+		<module>herbstwolke-deployer-cloudfoundry</module>
 	</modules>
 
 	<dependencyManagement>
@@ -158,9 +158,9 @@
 				<scope>import</scope>
 			</dependency>
 			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-deployer-dependencies</artifactId>
-				<version>2.9.5</version>
+				<groupId>org.vetronauta</groupId>
+				<artifactId>herbstwolke-deployer-dependencies</artifactId>
+				<version>0.1.0-SNAPSHOT</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
