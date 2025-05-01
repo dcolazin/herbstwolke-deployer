@@ -4,7 +4,6 @@
 
 	<artifactId>herbstwolke-deployer-spi</artifactId>
 	<packaging>jar</packaging>
-	<name>Spring Cloud Deployer SPI</name>
 
 	<parent>
 		<groupId>org.vetronauta</groupId>

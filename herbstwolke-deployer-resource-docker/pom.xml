@@ -4,7 +4,6 @@
 
 	<artifactId>herbstwolke-deployer-resource-docker</artifactId>
 	<packaging>jar</packaging>
-	<name>Spring Cloud Deployer Resource Docker</name>
 
 	<parent>
 		<groupId>org.vetronauta</groupId>

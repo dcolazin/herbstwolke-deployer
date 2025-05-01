@@ -4,7 +4,6 @@
 
 	<artifactId>herbstwolke-deployer-local</artifactId>
 	<packaging>jar</packaging>
-	<name>Spring Cloud Deployer Local</name>
 
 	<parent>
 		<groupId>org.vetronauta</groupId>

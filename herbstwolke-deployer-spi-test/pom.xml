@@ -4,7 +4,6 @@
 
 	<artifactId>herbstwolke-deployer-spi-test</artifactId>
 	<packaging>jar</packaging>
-	<name>herbstwolke-deployer-spi-test</name>
 	<description>Base Tests for Spring Cloud Deployer SPI Implementations</description>
 
 	<parent>

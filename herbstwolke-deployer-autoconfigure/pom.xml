@@ -3,7 +3,6 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>herbstwolke-deployer-autoconfigure</artifactId>
 	<packaging>jar</packaging>
-	<name>Spring Cloud Deployer Autoconfigure</name>
 	<parent>
 		<groupId>org.vetronauta</groupId>
 		<artifactId>herbstwolke-deployer-parent</artifactId>

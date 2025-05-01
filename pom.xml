@@ -7,13 +7,7 @@
 	<groupId>org.vetronauta</groupId>
 	<packaging>pom</packaging>
 
-	<name>Spring Cloud Deployer</name>
-	<description>Spring Cloud Deployer</description>
-	<organization>
-		<name>Pivotal Software, Inc.</name>
-		<url>https://www.spring.io</url>
-	</organization>
-	<url>https://github.com/spring-cloud/herbstwolke-deployer</url>
+	<url>https://github.com/dcolazin/herbstwolke-deployer</url>
 	<licenses>
 		<license>
 			<name>Apache License, Version 2.0</name>
@@ -38,16 +32,16 @@
 		</license>
 	</licenses>
 	<scm>
-		<url>https://github.com/spring-cloud/herbstwolke-deployer</url>
-		<connection>scm:git:git://github.com/spring-cloud/herbstwolke-deployer.git</connection>
-		<developerConnection>scm:git:ssh://git@github.com/spring-cloud/herbstwolke-deployer.git</developerConnection>
+		<url>https://github.com/dcolazin/herbstwolke-deployer</url>
+		<connection>scm:git:git://github.com/dcolazin/herbstwolke-deployer.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/dcolazin/herbstwolke-deployer.git</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
 	<developers>
 		<developer>
-			<id>scdf-team</id>
-			<name>Data Flow Team</name>
-			<organizationUrl>https://github.com/spring-cloud/herbstwolke-deployer/graphs/contributors</organizationUrl>
+			<id>herbstwolke</id>
+			<name>Herbstwolke Team</name>
+			<organizationUrl>https://github.com/dcolazin/herbstwolke-deployer/graphs/contributors</organizationUrl>
 		</developer>
 	</developers>
 	<properties>
@@ -277,6 +271,7 @@
 				<version>3.8.0</version>
 				<configuration>
 					<release>${java.version}</release>
+					<showDeprecation>true</showDeprecation>
 				</configuration>
 			</plugin>
 			<plugin>

@@ -4,7 +4,6 @@
 
 	<artifactId>herbstwolke-deployer-resource-maven</artifactId>
 	<packaging>jar</packaging>
-	<name>Spring Cloud Deployer Resource Maven</name>
 
 	<parent>
 		<groupId>org.vetronauta</groupId>
