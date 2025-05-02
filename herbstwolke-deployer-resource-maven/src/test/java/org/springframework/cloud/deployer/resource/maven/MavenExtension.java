@@ -24,15 +24,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.User.UserBuilder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -105,8 +104,7 @@ public class MavenExtension implements AfterEachCallback, BeforeEachCallback {
 	}
 
 	@Configuration
-	static class BasicSecurityConfig extends WebSecurityConfigurerAdapter {
-
+	static class TestSecurityConfig {
 		@Bean
 		public UserDetailsService userDetailsService() {
 			UserBuilder users = User.builder();
@@ -115,43 +113,37 @@ public class MavenExtension implements AfterEachCallback, BeforeEachCallback {
 			return manager;
 		}
 
-		@Override
-		protected void configure(HttpSecurity http) throws Exception {
-
-			// We add basic auth for /private so server returns 401 and
-			// challenge happens with maven client.
-
-			http
-				.authorizeRequests()
-					.antMatchers("/public/**").permitAll()
-					.antMatchers("/private/**").hasRole("USER")
-					.and()
-				.httpBasic();
-		}
-	}
-
-	@Configuration
-	@Order(1)
-	static class PreemptiveSecurityConfig extends WebSecurityConfigurerAdapter {
-
-		@Override
-		protected void configure(HttpSecurity http) throws Exception {
-
+		@Bean
+		public SecurityFilterChain preemptiveSecurity(HttpSecurity http) throws Exception {
 			// We add basic auth for /preemptive so server returns 403 as
 			// exception handling is changed to force 403.
 			// normal maven behaviour is that it needs 401 to continue with a challenge.
 			// This is where preemptive auth takes place as client should send auth
 			// with every request.
-
 			http
 				.antMatcher("/preemptive/**")
 				.authorizeRequests(authorizeRequests ->
-                    authorizeRequests.anyRequest().hasRole("USER")
+					authorizeRequests.anyRequest().hasRole("USER")
 				)
 				.httpBasic()
-					.and()
+				.and()
 				.exceptionHandling()
-					.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.FORBIDDEN));
+				.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.FORBIDDEN));
+			return http.build();
 		}
+
+		@Bean
+		public SecurityFilterChain publicPrivateSecurity(HttpSecurity http) throws Exception {
+			http
+				.authorizeRequests(authorizeRequests ->
+					authorizeRequests
+						.antMatchers("/public/**").permitAll()
+						.antMatchers("/private/**").hasRole("USER")
+				)
+				.httpBasic();
+			return http.build();
+		}
+
 	}
+
 }

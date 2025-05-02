@@ -53,7 +53,7 @@
 		<commons-compress.version>1.26.1</commons-compress.version>
 		<commons-io.version>2.15.1</commons-io.version>
 		<kubernetes-fabric8-client.version>5.12.4</kubernetes-fabric8-client.version>
-		<spring-boot.version>2.7.18</spring-boot.version>
+		<spring-boot.version>2.7.18</spring-boot.version> <!-- TODO migrate to 3.0.13 -->
 		<spring-framework.version>5.3.39</spring-framework.version>
 		<maven.compiler.release>${java.version}</maven.compiler.release>
 		<logback.version>1.2.13</logback.version>
