@@ -121,7 +121,7 @@ public class MavenExtension implements AfterEachCallback, BeforeEachCallback {
 			// This is where preemptive auth takes place as client should send auth
 			// with every request.
 			http
-				.antMatcher("/preemptive/**")
+				.securityMatcher("/preemptive/**")
 				.authorizeRequests(authorizeRequests ->
 					authorizeRequests.anyRequest().hasRole("USER")
 				)
@@ -137,8 +137,8 @@ public class MavenExtension implements AfterEachCallback, BeforeEachCallback {
 			http
 				.authorizeRequests(authorizeRequests ->
 					authorizeRequests
-						.antMatchers("/public/**").permitAll()
-						.antMatchers("/private/**").hasRole("USER")
+						.requestMatchers("/public/**").permitAll()
+						.requestMatchers("/private/**").hasRole("USER")
 				)
 				.httpBasic();
 			return http.build();
