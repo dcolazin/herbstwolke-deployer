@@ -116,15 +116,14 @@ public class CloudFoundryAppDeployer extends AbstractCloudFoundryDeployer implem
 			.timeout(Duration.ofSeconds(this.deploymentProperties.getApiTimeout()))
 			.doOnSuccess(item -> {
 				logger.info("Successfully deployed {}", deploymentId);
+				deleteLocalApplicationResourceFile(request);
 			})
 			.doOnError(error -> {
 				if (isNotFoundError().test(error)) {
-					logger.warn("Unable to deploy application. It may have been destroyed before start completed: " + error.getMessage());
+                    logger.warn("Unable to deploy application. It may have been destroyed before start completed: {}", error.getMessage());
 				} else {
 					logError(String.format("Failed to deploy %s", deploymentId)).accept(error);
 				}
-			})
-			.doOnSuccessOrError((r, e) -> {
 				deleteLocalApplicationResourceFile(request);
 			})
 			.subscribe();
@@ -260,8 +259,8 @@ public class CloudFoundryAppDeployer extends AbstractCloudFoundryDeployer implem
 	}
 
 	private AppStatus createAppStatus(ApplicationDetail applicationDetail, String deploymentId) {
-		logger.trace("Gathering instances for " + applicationDetail);
-		logger.trace("InstanceDetails: " + applicationDetail.getInstanceDetails());
+        logger.trace("Gathering instances for {}", applicationDetail);
+        logger.trace("InstanceDetails: {}", applicationDetail.getInstanceDetails());
 
 		AppStatus.Builder builder = AppStatus.of(deploymentId);
 

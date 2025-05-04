@@ -54,7 +54,6 @@
 		<commons-io.version>2.15.1</commons-io.version>
 		<kubernetes-fabric8-client.version>5.12.4</kubernetes-fabric8-client.version>
 		<spring-boot.version>3.0.13</spring-boot.version>
-		<spring-framework.version>5.3.39</spring-framework.version>
 		<maven.compiler.release>${java.version}</maven.compiler.release>
 		<logback.version>1.2.13</logback.version>
 		<json-path.version>2.9.0</json-path.version>
@@ -136,14 +135,6 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
-			<!-- Override Spring Framework provided by Spring Boot
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-framework-bom</artifactId>
-				<version>${spring-framework.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency> -->
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-dependencies</artifactId>
