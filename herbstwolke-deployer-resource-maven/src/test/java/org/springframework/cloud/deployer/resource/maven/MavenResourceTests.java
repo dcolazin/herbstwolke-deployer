@@ -164,7 +164,7 @@ public class MavenResourceTests {
 	public void checkRepositoryPolicies() {
 		MavenProperties mavenProperties = new MavenProperties();
 		mavenProperties.setIncludeDefaultRemoteRepos(false); //TODO test also the true case
-		mavenProperties.setChecksumPolicy("always");
+		mavenProperties.setChecksumPolicy("warn");
 		mavenProperties.setUpdatePolicy("fail");
 		Map<String, MavenProperties.RemoteRepository> remoteRepositoryMap = new HashMap<>();
 		MavenProperties.RemoteRepository remoteRepo1 = new MavenProperties.RemoteRepository(
@@ -201,7 +201,7 @@ public class MavenResourceTests {
 		ReflectionUtils.makeAccessible(repositorySystemSessionMethod);
 		RepositorySystemSession repositorySystemSession = (RepositorySystemSession)
 				ReflectionUtils.invokeMethod(repositorySystemSessionMethod, artifactResolver, repositorySystem1, "file://local");
-		Assertions.assertEquals("always", repositorySystemSession.getChecksumPolicy());
+		Assertions.assertEquals("warn", repositorySystemSession.getChecksumPolicy());
 		Assertions.assertEquals("fail", repositorySystemSession.getUpdatePolicy());
 		for (RemoteRepository remoteRepository : remoteRepositoryList) {
 			Assertions.assertEquals(2, remoteRepositoryList.size());
