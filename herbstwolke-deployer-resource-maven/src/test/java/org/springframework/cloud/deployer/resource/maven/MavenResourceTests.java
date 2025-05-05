@@ -163,7 +163,7 @@ public class MavenResourceTests {
 	@Test
 	public void checkRepositoryPolicies() {
 		MavenProperties mavenProperties = new MavenProperties();
-		mavenProperties.setIncludeDefaultRemoteRepos(false);
+		mavenProperties.setIncludeDefaultRemoteRepos(false); //TODO test also the true case
 		mavenProperties.setChecksumPolicy("always");
 		mavenProperties.setUpdatePolicy("fail");
 		Map<String, MavenProperties.RemoteRepository> remoteRepositoryMap = new HashMap<>();
