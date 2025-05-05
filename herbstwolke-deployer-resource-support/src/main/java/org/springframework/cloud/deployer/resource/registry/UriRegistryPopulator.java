@@ -65,7 +65,7 @@ public class UriRegistryPopulator implements ResourceLoaderAware {
 	 * @return the registered URI values in the map with the keys being the property names
 	 */
 	public Map<String, URI> populateRegistry(boolean overwrite, UriRegistry registry, String... resourceUris) {
-		Assert.notEmpty(resourceUris);
+		Assert.notEmpty(resourceUris, "strings indicating URI to load properties are empty");
 		Map<String, URI> registered = new HashMap<>();
 		for (String resourceUri : resourceUris) {
 			Resource resource = this.resourceLoader.getResource(resourceUri);
@@ -76,11 +76,7 @@ public class UriRegistryPopulator implements ResourceLoaderAware {
 					try {
 						URI uri = new URI(properties.getProperty(key));
 						boolean validUri = true;
-						if (uri == null || StringUtils.isEmpty(uri)) {
-							logger.warn(String.format("Error when registering '%s': URI is required", key));
-							validUri = false;
-						}
-						if (validUri && !StringUtils.hasText(uri.getScheme())) {
+						if (!StringUtils.hasText(uri.getScheme())) {
 							logger.warn(String.format("Error when registering '%s' with URI %s: URI scheme must be specified", key, uri));
 							validUri = false;
 						}

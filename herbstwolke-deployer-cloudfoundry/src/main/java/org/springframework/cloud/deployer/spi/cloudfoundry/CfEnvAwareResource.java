@@ -19,18 +19,16 @@ package org.springframework.cloud.deployer.spi.cloudfoundry;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.springframework.boot.loader.archive.JarFileArchive;
+import org.springframework.boot.loader.launch.Archive;
 import org.springframework.core.io.Resource;
 
 /**
@@ -117,8 +115,7 @@ class CfEnvAwareResource implements Resource {
 
 		private static final String CF_ENV = "io.pivotal.cfenv.core.CfEnv";
 
-		static boolean hasCfEnv(CfEnvAwareResource app
-		) {
+		static boolean hasCfEnv(CfEnvAwareResource app) {
 			try {
 				String scheme = app.getURI().getScheme().toLowerCase();
 				if (scheme.equals("docker")) {
@@ -130,16 +127,14 @@ class CfEnvAwareResource implements Resource {
 			}
 
 			try {
-				JarFileArchive archive = new JarFileArchive(app.getFile());
-				List<URL> urls = new ArrayList<>();
-				archive.getNestedArchives(entry -> entry.getName().endsWith(".jar"), null).forEachRemaining(a -> {
-					try {
-						urls.add(a.getUrl());
-					}
-					catch (MalformedURLException e) {
-						logger.error("Unable to process nested archive " +  e.getMessage());
-					}
-				});
+				Archive archive = Archive.create(app.getFile());
+				Set<URL> urls;
+				try {
+					urls = archive.getClassPathUrls(entry -> entry.name().endsWith(".jar"), null);
+				} catch (IOException ioe) {
+					logger.error("Unable to process nested archive " +  ioe.getMessage(), ioe);
+					return false;
+				}
 				URLClassLoader classLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]), null);
 				try {
 					logger.info("Attempting to load class CFEnv");

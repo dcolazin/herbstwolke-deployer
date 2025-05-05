@@ -72,13 +72,13 @@ import org.cloudfoundry.operations.applications.GetApplicationRequest;
 import org.cloudfoundry.operations.applications.PushApplicationManifestRequest;
 import org.cloudfoundry.operations.applications.StopApplicationRequest;
 import org.cloudfoundry.operations.services.Services;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.internal.matchers.Any;
-import org.springframework.cloud.deployer.spi.task.TaskLauncher;
+import org.springframework.boot.loader.net.protocol.Handlers;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -139,6 +139,11 @@ public class CloudFoundryTaskLauncherTests {
 
 	private Resource resource = new FileSystemResource("src/test/resources/demo-0.0.1-SNAPSHOT.jar");
 
+	@BeforeAll
+	static void initNestedHandlers() {
+		Handlers.register();
+	}
+
 	@BeforeEach
 	void setUp() {
 		MockitoAnnotations.initMocks(this);
@@ -147,6 +152,7 @@ public class CloudFoundryTaskLauncherTests {
 		given(this.client.tasks()).willReturn(this.tasks);
 
 		given(this.operations.applications()).willReturn(this.applications);
+		given(this.applications.pushManifest(any())).willReturn(Mono.empty());
 		given(this.operations.services()).willReturn(this.services);
 		given(this.client.spaces()).willReturn(this.spaces);
 		given(this.client.organizations()).willReturn(this.organizations);

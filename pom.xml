@@ -47,19 +47,19 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>17</java.version>
+		<maven.compiler.release>${java.version}</maven.compiler.release>
+		<!-- dep versions -->
 		<maven.version>3.9.9</maven.version>
 		<maven-resolver.version>1.9.22</maven-resolver.version>
-		<maven-wagon.version>3.5.2</maven-wagon.version>
-		<commons-compress.version>1.26.1</commons-compress.version>
-		<commons-io.version>2.15.1</commons-io.version>
+		<maven-wagon.version>3.5.3</maven-wagon.version>
+		<commons-io.version>2.19.0</commons-io.version>
 		<kubernetes-fabric8-client.version>5.12.4</kubernetes-fabric8-client.version>
-		<spring-boot.version>3.0.13</spring-boot.version>
-		<maven.compiler.release>${java.version}</maven.compiler.release>
-		<logback.version>1.2.13</logback.version>
-		<json-path.version>2.9.0</json-path.version>
-		<okio.version>3.4.0</okio.version>
-		<jackson-bom.version>2.17.2</jackson-bom.version>
-		<snakeyaml.version>1.33</snakeyaml.version>
+		<spring-boot.version>3.4.5</spring-boot.version>
+		<hashids.version>1.0.3</hashids.version>
+		<cloudfoundry-java-lib.version>5.12.0.RELEASE</cloudfoundry-java-lib.version>
+		<pivotal-cf-client-reactor.version>2.2.0.RELEASE</pivotal-cf-client-reactor.version>
+		<okhttp.version>3.14.9</okhttp.version>
+		<hamcrest.version>1.3</hamcrest.version>
 	</properties>
 
 	<modules>
@@ -80,19 +80,44 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>org.yaml</groupId>
-				<artifactId>snakeyaml</artifactId>
-				<version>${snakeyaml.version}</version>
+				<groupId>org.apache.maven</groupId>
+				<artifactId>maven-resolver-provider</artifactId>
+				<version>${maven.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.jayway.jsonpath</groupId>
-				<artifactId>json-path</artifactId>
-				<version>${json-path.version}</version>
+				<groupId>org.apache.maven.resolver</groupId>
+				<artifactId>maven-resolver-connector-basic</artifactId>
+				<version>${maven-resolver.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.squareup.okio</groupId>
-				<artifactId>okio</artifactId>
-				<version>${okio.version}</version>
+				<groupId>org.apache.maven.resolver</groupId>
+				<artifactId>maven-resolver-transport-file</artifactId>
+				<version>${maven-resolver.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.maven.resolver</groupId>
+				<artifactId>maven-resolver-transport-http</artifactId>
+				<version>${maven-resolver.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.maven.resolver</groupId>
+				<artifactId>maven-resolver-transport-wagon</artifactId>
+				<version>${maven-resolver.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.cloudfoundry</groupId>
+				<artifactId>cloudfoundry-client-reactor</artifactId>
+				<version>${cloudfoundry-java-lib.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.cloudfoundry</groupId>
+				<artifactId>cloudfoundry-operations</artifactId>
+				<version>${cloudfoundry-java-lib.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.pivotal</groupId>
+				<artifactId>pivotal-cloudfoundry-client-reactor</artifactId>
+				<version>${pivotal-cf-client-reactor.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>io.fabric8</groupId>
@@ -102,38 +127,14 @@
 				<scope>import</scope>
 			</dependency>
 			<dependency>
-				<groupId>org.apache.commons</groupId>
-				<artifactId>commons-compress</artifactId>
-				<version>${commons-compress.version}</version>
+				<groupId>org.hashids</groupId>
+				<artifactId>hashids</artifactId>
+				<version>${hashids.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>
 				<version>${commons-io.version}</version>
-			</dependency>
-			<!-- Override Logback provided by Spring Boot -->
-			<dependency>
-				<groupId>ch.qos.logback</groupId>
-				<artifactId>logback-core</artifactId>
-				<version>${logback.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>ch.qos.logback</groupId>
-				<artifactId>logback-classic</artifactId>
-				<version>${logback.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>ch.qos.logback</groupId>
-				<artifactId>logback-access</artifactId>
-				<version>${logback.version}</version>
-			</dependency>
-			<!-- Override Jackson provided by Spring Boot -->
-			<dependency>
-				<groupId>com.fasterxml.jackson</groupId>
-				<artifactId>jackson-bom</artifactId>
-				<version>${jackson-bom.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
@@ -153,6 +154,16 @@
 				<groupId>org.apache.maven.wagon</groupId>
 				<artifactId>wagon-http</artifactId>
 				<version>${maven-wagon.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.squareup.okhttp3</groupId>
+				<artifactId>mockwebserver</artifactId>
+				<version>${okhttp.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.hamcrest</groupId>
+				<artifactId>hamcrest-all</artifactId>
+				<version>${hamcrest.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
