@@ -16,11 +16,9 @@
 
 package org.springframework.cloud.deployer.resource.maven;
 
-import org.junit.Test;
-
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.io.Resource;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Tests for the {@link MavenResourceLoader}.
@@ -34,17 +32,17 @@ public class MavenResourceLoaderTests {
 		String location = "maven://foo:bar:1.0.1";
 		MavenResourceLoader loader = new MavenResourceLoader(new MavenProperties());
 		Resource resource = loader.getResource(location);
-		assertEquals(MavenResource.class, resource.getClass());
+		Assertions.assertEquals(MavenResource.class, resource.getClass());
 		MavenResource mavenResource = (MavenResource) resource;
-		assertEquals("foo", mavenResource.getGroupId());
-		assertEquals("bar", mavenResource.getArtifactId());
-		assertEquals("1.0.1", mavenResource.getVersion());
+		Assertions.assertEquals("foo", mavenResource.getGroupId());
+		Assertions.assertEquals("bar", mavenResource.getArtifactId());
+		Assertions.assertEquals("1.0.1", mavenResource.getVersion());
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void invalidPrefix() {
 		MavenResourceLoader loader = new MavenResourceLoader(new MavenProperties());
-		loader.getResource("foo://bar");
+		Assertions.assertThrows(IllegalArgumentException.class, () -> loader.getResource("foo://bar"));
 	}
 
 }

@@ -28,13 +28,11 @@ import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.RepositoryPolicy;
-import org.junit.Test;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 /**
  * Tests for {@link MavenResource}
@@ -53,12 +51,9 @@ public class MavenResourceTests {
 				.groupId("org.springframework.cloud.task.app")
 				.version("1.0.0.BUILD-SNAPSHOT")
 				.build();
-		assertNotNull("getFilename() returned null", resource.getFilename());
-		assertEquals("getFilename() doesn't match the expected filename",
-				"timestamp-task-1.0.0.BUILD-SNAPSHOT.jar", resource.getFilename());
-		assertEquals("getURI doesn't match the expected URI",
-				"maven://org.springframework.cloud.task.app:timestamp-task:jar:1.0.0.BUILD-SNAPSHOT",
-				resource.getURI().toString());
+		Assertions.assertNotNull(resource.getFilename(), "getFilename() returned null");
+		Assertions.assertEquals("timestamp-task-1.0.0.BUILD-SNAPSHOT.jar", resource.getFilename(), "getFilename() doesn't match the expected filename");
+		Assertions.assertEquals("maven://org.springframework.cloud.task.app:timestamp-task:jar:1.0.0.BUILD-SNAPSHOT", resource.getURI().toString(), "getURI doesn't match the expected URI");
 	}
 
 	@Test
@@ -70,7 +65,7 @@ public class MavenResourceTests {
 		mavenProperties.setRemoteRepositories(remoteRepositoryMap);
 		MavenResource resource = MavenResource
 				.parse("org.springframework.cloud.task.app:timestamp-task:jar:1.0.0.BUILD-SNAPSHOT", mavenProperties);
-		assertEquals(resource.exists(), true);
+        Assertions.assertTrue(resource.exists());
 	}
 
 	@Test
@@ -82,18 +77,16 @@ public class MavenResourceTests {
 		mavenProperties.setRemoteRepositories(remoteRepositoryMap);
 		MavenResource resource = MavenResource
 				.parse("org.springframework.cloud.task.app:doesnotexist:jar:1.0.0.BUILD-SNAPSHOT", mavenProperties);
-		assertEquals(resource.exists(), false);
+        Assertions.assertFalse(resource.exists());
 	}
 
 	@Test
 	public void coordinatesParsed() {
 		MavenResource resource = MavenResource
 				.parse("org.springframework.cloud.task.app:timestamp-task:jar:exec:1.0.0.BUILD-SNAPSHOT");
-		assertEquals("getFilename() doesn't match the expected filename",
-				"timestamp-task-1.0.0.BUILD-SNAPSHOT-exec.jar", resource.getFilename());
+		Assertions.assertEquals("timestamp-task-1.0.0.BUILD-SNAPSHOT-exec.jar", resource.getFilename(), "getFilename() doesn't match the expected filename");
 		resource = MavenResource.parse("org.springframework.cloud.task.app:timestamp-task:jar:1.0.0.BUILD-SNAPSHOT");
-		assertEquals("getFilename() doesn't match the expected filename",
-				"timestamp-task-1.0.0.BUILD-SNAPSHOT.jar", resource.getFilename());
+		Assertions.assertEquals("timestamp-task-1.0.0.BUILD-SNAPSHOT.jar", resource.getFilename(), "getFilename() doesn't match the expected filename");
 	}
 
 	@Test
@@ -108,12 +101,11 @@ public class MavenResourceTests {
 				new MavenProperties.RemoteRepository("https://repo.spring.io/libs-snapshot"));
 		properties.setRemoteRepositories(remoteRepositoryMap);
 		MavenResource resource = MavenResource.parse(coordinates, properties);
-		assertEquals("getFilename() doesn't match the expected filename",
-				"timestamp-task-1.0.0.BUILD-SNAPSHOT.jar", resource.getFilename());
+		Assertions.assertEquals("timestamp-task-1.0.0.BUILD-SNAPSHOT.jar", resource.getFilename(), "getFilename() doesn't match the expected filename");
 	}
 
-	@Test(expected = IllegalStateException.class)
-	public void localResolutionFailsIfNotCached() throws Exception {
+	@Test
+	public void localResolutionFailsIfNotCached() {
 		String tempLocalRepo = System.getProperty("java.io.tmpdir") + File.separator + ".m2-test2";
 		new File(tempLocalRepo).deleteOnExit();
 		MavenProperties properties = new MavenProperties();
@@ -124,7 +116,7 @@ public class MavenResourceTests {
 				.groupId("org.springframework.cloud.task.app")
 				.version("1.0.0.BUILD-SNAPSHOT")
 				.build();
-		resource.getFile();
+		Assertions.assertThrows(IllegalStateException.class, resource::getFile);
 	}
 
 	@Test
@@ -171,6 +163,7 @@ public class MavenResourceTests {
 	@Test
 	public void checkRepositoryPolicies() {
 		MavenProperties mavenProperties = new MavenProperties();
+		mavenProperties.setIncludeDefaultRemoteRepos(false);
 		mavenProperties.setChecksumPolicy("always");
 		mavenProperties.setUpdatePolicy("fail");
 		Map<String, MavenProperties.RemoteRepository> remoteRepositoryMap = new HashMap<>();
@@ -208,38 +201,38 @@ public class MavenResourceTests {
 		ReflectionUtils.makeAccessible(repositorySystemSessionMethod);
 		RepositorySystemSession repositorySystemSession = (RepositorySystemSession)
 				ReflectionUtils.invokeMethod(repositorySystemSessionMethod, artifactResolver, repositorySystem1, "file://local");
-		assertEquals("always", repositorySystemSession.getChecksumPolicy());
-		assertEquals("fail", repositorySystemSession.getUpdatePolicy());
+		Assertions.assertEquals("always", repositorySystemSession.getChecksumPolicy());
+		Assertions.assertEquals("fail", repositorySystemSession.getUpdatePolicy());
 		for (RemoteRepository remoteRepository : remoteRepositoryList) {
-			assertEquals(2, remoteRepositoryList.size());
-			assertEquals(true, remoteRepositoryList.get(0).getId().equals("repo1")
-					|| remoteRepositoryList.get(0).getId().equals("repo2"));
-			assertEquals(true, remoteRepositoryList.get(1).getId().equals("repo2")
-					|| remoteRepositoryList.get(1).getId().equals("repo1"));
+			Assertions.assertEquals(2, remoteRepositoryList.size());
+            Assertions.assertTrue(remoteRepositoryList.get(0).getId().equals("repo1")
+                || remoteRepositoryList.get(0).getId().equals("repo2"));
+            Assertions.assertTrue(remoteRepositoryList.get(1).getId().equals("repo2")
+                || remoteRepositoryList.get(1).getId().equals("repo1"));
 			if (remoteRepository.getId().equals("repo1")) {
 				RepositoryPolicy snapshotPolicy1 = remoteRepository.getPolicy(true);
-				assertEquals(true, snapshotPolicy1.isEnabled());
-				assertEquals("always", snapshotPolicy1.getUpdatePolicy());
-				assertEquals("warn", snapshotPolicy1.getChecksumPolicy());
+                Assertions.assertTrue(snapshotPolicy1.isEnabled());
+				Assertions.assertEquals("always", snapshotPolicy1.getUpdatePolicy());
+				Assertions.assertEquals("warn", snapshotPolicy1.getChecksumPolicy());
 				RepositoryPolicy releasePolicy1 = remoteRepository.getPolicy(false);
-				assertEquals(true, releasePolicy1.isEnabled());
-				assertEquals("interval", releasePolicy1.getUpdatePolicy());
-				assertEquals("ignore", releasePolicy1.getChecksumPolicy());
+                Assertions.assertTrue(releasePolicy1.isEnabled());
+				Assertions.assertEquals("interval", releasePolicy1.getUpdatePolicy());
+				Assertions.assertEquals("ignore", releasePolicy1.getChecksumPolicy());
 			}
 			else if (remoteRepository.getId().equals("repo2")) {
 				RepositoryPolicy snapshotPolicy2 = remoteRepository.getPolicy(true);
-				assertEquals(true, snapshotPolicy2.isEnabled());
-				assertEquals("daily", snapshotPolicy2.getUpdatePolicy());
-				assertEquals("fail", snapshotPolicy2.getChecksumPolicy());
+                Assertions.assertTrue(snapshotPolicy2.isEnabled());
+				Assertions.assertEquals("daily", snapshotPolicy2.getUpdatePolicy());
+				Assertions.assertEquals("fail", snapshotPolicy2.getChecksumPolicy());
 				RepositoryPolicy releasePolicy2 = remoteRepository.getPolicy(false);
-				assertEquals(true, releasePolicy2.isEnabled());
-				assertEquals("daily", releasePolicy2.getUpdatePolicy());
-				assertEquals("fail", releasePolicy2.getChecksumPolicy());
+                Assertions.assertTrue(releasePolicy2.isEnabled());
+				Assertions.assertEquals("daily", releasePolicy2.getUpdatePolicy());
+				Assertions.assertEquals("fail", releasePolicy2.getChecksumPolicy());
 			}
 		}
 		MavenResource resource = MavenResource
 				.parse("org.springframework.cloud.task.app:timestamp-task:jar:1.0.0.BUILD-SNAPSHOT", mavenProperties);
-		assertEquals(resource.exists(), true);
+        Assertions.assertTrue(resource.exists());
 	}
 
 }
