@@ -15,13 +15,10 @@
  */
 package org.springframework.cloud.deployer.resource.support;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import java.io.File;
-
-import org.junit.Test;
-
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
 /**
  * @author Mark Pollack
@@ -33,7 +30,7 @@ public class DownloadingUrlResourceTests {
 		DownloadingUrlResource httpResource = new DownloadingUrlResource("https://repo1.maven.org/maven2/org/springframework/cloud/stream/app/file-sink-rabbit/3.2.1/file-sink-rabbit-3.2.1.jar");
 		File file1 = httpResource.getFile();
 		File file2 = httpResource.getFile();
-		assertThat(file1, is(equalTo(file2)));
-		assertThat(file1.getName(), is(equalTo("81a23583726958052fdf75c399b81a3c4fcab6d1-filesinkrabbit321jar")));
+		Assertions.assertEquals(file1, file2);
+		Assertions.assertEquals("81a23583726958052fdf75c399b81a3c4fcab6d1-filesinkrabbit321jar", file1.getName());
 	}
 }

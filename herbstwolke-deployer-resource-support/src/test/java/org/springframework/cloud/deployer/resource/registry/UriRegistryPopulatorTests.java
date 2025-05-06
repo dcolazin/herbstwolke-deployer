@@ -24,15 +24,11 @@ import java.net.URI;
 import java.util.Map;
 import java.util.Properties;
 
-import org.junit.Test;
-
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.cloud.deployer.resource.StubResourceLoader;
 import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.Resource;
-
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Patrick Peralta
@@ -58,23 +54,14 @@ public class UriRegistryPopulatorTests {
 
 		UriRegistry registry = new InMemoryUriRegistry();
 		populator.populateRegistry(true, registry, localUri);
-		assertTrue(resourceLoader.getRequestedLocations().contains(localUri));
-		assertThat(resourceLoader.getRequestedLocations().size(), is(1));
-		assertThat(registry.findAll().size(), is(this.uris.size()));
+		Assertions.assertTrue(resourceLoader.getRequestedLocations().contains(localUri));
+		Assertions.assertEquals(1, resourceLoader.getRequestedLocations().size());
+		Assertions.assertEquals(this.uris.size(), registry.findAll().size());
 		for (String key : this.uris.stringPropertyNames()) {
-			assertThat(registry.find(key).toString(), is(this.uris.getProperty(key)));
+			Assertions.assertEquals(this.uris.getProperty(key), registry.find(key).toString());
 		}
 
-		boolean thrown = false;
-		try {
-			registry.find("not present");
-		}
-		catch (IllegalArgumentException e) {
-			thrown = true;
-		}
-		finally {
-			assertTrue(thrown);
-		}
+		Assertions.assertThrows(IllegalArgumentException.class, () -> registry.find("not present"));
 	}
 
 	@Test
@@ -86,16 +73,16 @@ public class UriRegistryPopulatorTests {
 		populator.setResourceLoader(resourceLoader);
 		UriRegistry registry = new InMemoryUriRegistry();
 		Map<String, URI> registered = populator.populateRegistry(true, registry, localUri);
-		assertTrue(registered.size() == 3);
+        Assertions.assertEquals(3, registered.size());
 		// Perform overwrites on the existing keys
 		Map<String, URI> registeredWithNoOverwrites = populator.populateRegistry(false, registry, localUri);
-		assertTrue(registeredWithNoOverwrites.size() == 0);
+        Assertions.assertEquals(0, registeredWithNoOverwrites.size());
 		propertiesResource.addNewProperty("another", "maven://somegroup:someartifact:jar:exec:1.0.0");
 		Map<String, URI> newlyRegisteredWithNoOverwrites = populator.populateRegistry(false, registry, localUri);
-		assertTrue(newlyRegisteredWithNoOverwrites.size() == 1);
+        Assertions.assertEquals(1, newlyRegisteredWithNoOverwrites.size());
 		propertiesResource.addNewProperty("yet-another", "file:///tmp/yet-another.jar");
 		Map<String, URI> newlyRegisteredWithOverwrites = populator.populateRegistry(true, registry, localUri);
-		assertTrue(newlyRegisteredWithOverwrites.size() == 5);
+        Assertions.assertEquals(5, newlyRegisteredWithOverwrites.size());
 	}
 
 	@Test
@@ -108,14 +95,14 @@ public class UriRegistryPopulatorTests {
 		populator.setResourceLoader(resourceLoader);
 		UriRegistry registry = new InMemoryUriRegistry();
 		populator.populateRegistry(true, registry, localUri);
-		assertTrue(resourceLoader.getRequestedLocations().contains(localUri));
-		assertThat(resourceLoader.getRequestedLocations().size(), is(1));
-		assertThat(registry.findAll().size(), is(1));
-		assertThat(registry.find("test").toString(), is("file:///bar-1.2.3.jar"));
+		Assertions.assertTrue(resourceLoader.getRequestedLocations().contains(localUri));
+		Assertions.assertEquals(1, resourceLoader.getRequestedLocations().size());
+		Assertions.assertEquals(1, registry.findAll().size());
+		Assertions.assertEquals("file:///bar-1.2.3.jar", registry.find("test").toString());
 		populator.populateRegistry(true, registry, localUri);
 		props.setProperty("test", "invalid");
 		populator.populateRegistry(true, registry, localUri);
-		assertThat(registry.find("test").toString(), is("file:///bar-1.2.3.jar"));
+		Assertions.assertEquals("file:///bar-1.2.3.jar", registry.find("test").toString());
 	}
 
 

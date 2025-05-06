@@ -16,13 +16,12 @@
 
 package org.springframework.cloud.deployer.resource.support;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import java.security.SecureRandom;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Simple sha utils tests.
@@ -38,7 +37,7 @@ public class ShaUtilsTests {
 			for (int i = 0; i < 1000; i++) {
 				nodups.add(ShaUtils.sha1(randomString(20)));
 			}
-			assertEquals(nodups.size() == 1000, true);
+            Assertions.assertEquals(1000, nodups.size());
 		}
 	}
 

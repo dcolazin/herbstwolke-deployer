@@ -350,7 +350,7 @@ public abstract class AbstractSchedulerIntegrationJUnit5Tests {
     }
 
 	/**
-	 * Return a resource corresponding to the spring-cloud-deployer-spi-scheduler-test-app app suitable for the target runtime.
+	 * Return a resource corresponding to the herbstwolke-deployer-spi-scheduler-test-app app suitable for the target runtime.
 	 *
 	 * The default implementation returns an uber-jar fetched via Maven. Subclasses may override.
 	 * @return the resource of the test application.
@@ -361,11 +361,11 @@ public abstract class AbstractSchedulerIntegrationJUnit5Tests {
 			properties.load(new ClassPathResource("integration-test-app.properties").getInputStream());
 		}
 		catch (IOException e) {
-			throw new RuntimeException("Failed to determine which version of spring-cloud-deployer-spi-scheduler-test-app to use", e);
+			throw new RuntimeException("Failed to determine which version of herbstwolke-deployer-spi-scheduler-test-app to use", e);
 		}
 		return new MavenResource.Builder(mavenProperties)
 				.groupId("org.springframework.cloud")
-				.artifactId("spring-cloud-deployer-spi-scheduler-test-app")
+				.artifactId("herbstwolke-deployer-spi-scheduler-test-app")
 				.classifier("exec")
 				.version(properties.getProperty("version"))
 				.extension("jar")

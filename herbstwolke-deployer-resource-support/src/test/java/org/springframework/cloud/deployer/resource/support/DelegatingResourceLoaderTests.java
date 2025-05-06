@@ -22,16 +22,11 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.cloud.deployer.resource.StubResourceLoader;
 import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ResourceLoader;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 
 /**
  * Tests for {@link DelegatingResourceLoader}.
@@ -42,17 +37,14 @@ import static org.junit.Assert.assertNotEquals;
  */
 public class DelegatingResourceLoaderTests {
 
-	@Rule
-	public TemporaryFolder folder = new TemporaryFolder();
-
 	@Test
 	public void test() {
 		NullResource one = new NullResource("one");
 		NullResource two = new NullResource("two");
 		NullResource three = new NullResource("three");
 
-		assertNotEquals(one, two);
-		assertNotEquals(two, three);
+		Assertions.assertNotEquals(one, two);
+		Assertions.assertNotEquals(two, three);
 
 		Map<String, ResourceLoader> map = new HashMap<>();
 		map.put("one", new StubResourceLoader(one));
@@ -60,9 +52,9 @@ public class DelegatingResourceLoaderTests {
 		map.put("three", new StubResourceLoader(three));
 
 		DelegatingResourceLoader resourceLoader = new DelegatingResourceLoader(map);
-		assertEquals(one, resourceLoader.getResource("one://one"));
-		assertEquals(two, resourceLoader.getResource("two://two"));
-		assertEquals(three, resourceLoader.getResource("three://three"));
+		Assertions.assertEquals(one, resourceLoader.getResource("one://one"));
+		Assertions.assertEquals(two, resourceLoader.getResource("two://two"));
+		Assertions.assertEquals(three, resourceLoader.getResource("three://three"));
 	}
 
 	static class NullResource extends AbstractResource {

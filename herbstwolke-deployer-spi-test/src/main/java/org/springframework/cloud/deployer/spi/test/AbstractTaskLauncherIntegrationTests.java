@@ -25,11 +25,13 @@ import java.util.Set;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.cloud.deployer.spi.core.AppDefinition;
 import org.springframework.cloud.deployer.spi.core.AppDeploymentRequest;
 import org.springframework.cloud.deployer.spi.core.RuntimeEnvironmentInfo;
@@ -39,9 +41,6 @@ import org.springframework.cloud.deployer.spi.task.TaskStatus;
 import org.springframework.core.io.Resource;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 
 /**
  * Abstract base class for integration tests of
@@ -87,12 +86,12 @@ public abstract class AbstractTaskLauncherIntegrationTests extends AbstractInteg
 	}
 
 
-	@Before
+	@BeforeEach
 	public void wrapDeployer() {
 		launcherWrapper = new TaskLauncherWrapper(provideTaskLauncher());
 	}
 
-	@After
+	@AfterEach
 	public void cleanupLingeringApps() {
 		for (String id : launcherWrapper.launchedTasks) {
 			try {
@@ -104,7 +103,7 @@ public abstract class AbstractTaskLauncherIntegrationTests extends AbstractInteg
 		}
 		for (String appName : launcherWrapper.deployedApps) {
 			try {
-				logger.warn("Test named '{}' left behind an app for ''. Trying to destroy.", name.getMethodName(), appName);
+				logger.warn("Test named '{}' left behind an app for ''. Trying to destroy {}.", name, appName);
 				launcherWrapper.wrapped.destroy(appName);
 			}
 			catch (Exception e) {
@@ -115,7 +114,7 @@ public abstract class AbstractTaskLauncherIntegrationTests extends AbstractInteg
 
 	@Test
 	public void testNonExistentAppsStatus() {
-		assertThat(randomName(), hasStatusThat(
+		MatcherAssert.assertThat(randomName(), hasStatusThat(
 				Matchers.<TaskStatus>hasProperty("state", is(LaunchState.unknown))));
 	}
 
@@ -132,7 +131,7 @@ public abstract class AbstractTaskLauncherIntegrationTests extends AbstractInteg
 		String launchId = taskLauncher().launch(request);
 
 		Timeout timeout = deploymentTimeout();
-		assertThat(launchId, EventuallyMatcher.eventually(hasStatusThat(
+		MatcherAssert.assertThat(launchId, EventuallyMatcher.eventually(hasStatusThat(
 				Matchers.<TaskStatus>hasProperty("state", Matchers.is(LaunchState.complete))), timeout.maxAttempts, timeout.pause));
 
 		taskLauncher().destroy(definition.getName());
@@ -151,16 +150,16 @@ public abstract class AbstractTaskLauncherIntegrationTests extends AbstractInteg
 		String launchId = taskLauncher().launch(request);
 
 		Timeout timeout = deploymentTimeout();
-		assertThat(launchId, EventuallyMatcher.eventually(hasStatusThat(
+		MatcherAssert.assertThat(launchId, EventuallyMatcher.eventually(hasStatusThat(
 				Matchers.<TaskStatus>hasProperty("state", Matchers.is(LaunchState.complete))), timeout.maxAttempts, timeout.pause));
 
 		logger.info("Re-Launching {}...", request.getDefinition().getName());
 		String newLaunchId = taskLauncher().launch(request);
 
-		assertThat(newLaunchId, not(is(launchId)));
+		Assertions.assertNotEquals(newLaunchId, launchId);
 
 		timeout = deploymentTimeout();
-		assertThat(newLaunchId, EventuallyMatcher.eventually(hasStatusThat(
+		MatcherAssert.assertThat(newLaunchId, EventuallyMatcher.eventually(hasStatusThat(
 				Matchers.<TaskStatus>hasProperty("state", Matchers.is(LaunchState.complete))), timeout.maxAttempts, timeout.pause));
 
 		taskLauncher().destroy(definition.getName());
@@ -179,7 +178,7 @@ public abstract class AbstractTaskLauncherIntegrationTests extends AbstractInteg
 		String launchId = taskLauncher().launch(request);
 
 		Timeout timeout = deploymentTimeout();
-		assertThat(launchId, EventuallyMatcher.eventually(hasStatusThat(
+		MatcherAssert.assertThat(launchId, EventuallyMatcher.eventually(hasStatusThat(
 				Matchers.<TaskStatus>hasProperty("state", Matchers.is(LaunchState.failed))), timeout.maxAttempts, timeout.pause));
 
 		taskLauncher().destroy(definition.getName());
@@ -198,14 +197,14 @@ public abstract class AbstractTaskLauncherIntegrationTests extends AbstractInteg
 		String launchId = taskLauncher().launch(request);
 
 		Timeout timeout = deploymentTimeout();
-		assertThat(launchId, EventuallyMatcher.eventually(hasStatusThat(
+		MatcherAssert.assertThat(launchId, EventuallyMatcher.eventually(hasStatusThat(
 				Matchers.<TaskStatus>hasProperty("state", Matchers.is(LaunchState.running))), timeout.maxAttempts, timeout.pause));
 
 		logger.info("Cancelling {}...", request.getDefinition().getName());
 		taskLauncher().cancel(launchId);
 
 		timeout = undeploymentTimeout();
-		assertThat(launchId, EventuallyMatcher.eventually(hasStatusThat(
+		MatcherAssert.assertThat(launchId, EventuallyMatcher.eventually(hasStatusThat(
 				Matchers.<TaskStatus>hasProperty("state", Matchers.is(LaunchState.cancelled))), timeout.maxAttempts, timeout.pause));
 
 		taskLauncher().destroy(definition.getName());
@@ -226,7 +225,7 @@ public abstract class AbstractTaskLauncherIntegrationTests extends AbstractInteg
 		String deploymentId = taskLauncher().launch(request);
 
 		Timeout timeout = deploymentTimeout();
-		assertThat(deploymentId, EventuallyMatcher.eventually(hasStatusThat(
+		MatcherAssert.assertThat(deploymentId, EventuallyMatcher.eventually(hasStatusThat(
 				Matchers.<TaskStatus>hasProperty("state", Matchers.is(LaunchState.complete))), timeout.maxAttempts, timeout.pause));
 		taskLauncher().destroy(definition.getName());
 	}
@@ -237,10 +236,10 @@ public abstract class AbstractTaskLauncherIntegrationTests extends AbstractInteg
 	@Test
 	public void testEnvironmentInfo() {
 		RuntimeEnvironmentInfo info = taskLauncher().environmentInfo();
-		assertNotNull(info.getImplementationVersion());
-		assertNotNull(info.getPlatformType());
-		assertNotNull(info.getPlatformClientVersion());
-		assertNotNull(info.getPlatformHostVersion());
+		Assertions.assertNotNull(info.getImplementationVersion());
+		Assertions.assertNotNull(info.getPlatformType());
+		Assertions.assertNotNull(info.getPlatformClientVersion());
+		Assertions.assertNotNull(info.getPlatformHostVersion());
 	}
 
 	/**

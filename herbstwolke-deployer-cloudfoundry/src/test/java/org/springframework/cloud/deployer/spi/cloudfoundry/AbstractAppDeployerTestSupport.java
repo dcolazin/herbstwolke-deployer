@@ -75,17 +75,13 @@ public abstract class AbstractAppDeployerTestSupport {
 	@Mock
 	protected ApplicationLogAccessor applicationLogAccessor;
 
-	@BeforeEach
-	public void setUp() {
+	protected void commonSetup() {
 		MockitoAnnotations.openMocks(this);
 		given(this.operations.applications()).willReturn(this.applications);
 		given(this.operations.services()).willReturn(this.services);
 		this.deployer = new CloudFoundryAppDeployer(this.applicationNameGenerator, this.deploymentProperties,
-				this.operations, this.runtimeEnvironmentInfo, this.applicationLogAccessor);
-		postSetUp();
+			this.operations, this.runtimeEnvironmentInfo, this.applicationLogAccessor);
 	}
-
-	protected abstract void postSetUp();
 
 	protected void givenRequestScaleApplication(String id, Integer count, int memoryLimit, int diskLimit,
 			Mono<Void> response) {

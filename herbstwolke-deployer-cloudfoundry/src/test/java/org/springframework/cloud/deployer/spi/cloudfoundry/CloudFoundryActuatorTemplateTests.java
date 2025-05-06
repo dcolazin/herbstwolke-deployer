@@ -22,15 +22,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import okhttp3.mockwebserver.Dispatcher;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.RecordedRequest;
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
+import com.github.tomakehurst.wiremock.matching.AbsentPattern;
+import com.github.tomakehurst.wiremock.matching.NotPattern;
 import org.cloudfoundry.operations.applications.ApplicationDetail;
 import org.cloudfoundry.operations.applications.InstanceDetail;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import reactor.core.publisher.Mono;
 
 import org.springframework.cloud.deployer.spi.app.ActuatorOperations;
@@ -38,81 +38,75 @@ import org.springframework.cloud.deployer.spi.app.AppAdmin;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StreamUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CloudFoundryActuatorTemplateTests extends AbstractAppDeployerTestSupport {
 
+	@RegisterExtension
+	static WireMockExtension wireMockExtension = WireMockExtension.newInstance()
+		.options(wireMockConfig().globalTemplating(true))
+		.build();
+
 	private ActuatorOperations actuatorOperations;
-	private static MockWebServer mockActuator;
 	String appBaseUrl;
 
-	@BeforeAll
-	static void setupMockServer() throws IOException {
-		mockActuator = new MockWebServer();
-		mockActuator.start();
-		mockActuator.setDispatcher(new Dispatcher() {
-			@Override
-			public MockResponse dispatch(RecordedRequest recordedRequest) throws InterruptedException {
-				assertThat(recordedRequest.getHeader("X-Cf-App-Instance")).isEqualTo("test-application-id:0");
-				switch (recordedRequest.getPath()) {
-				case "/actuator/info":
-					return new MockResponse().setBody(resourceAsString("actuator-info.json"))
-							.addHeader("Content-Type", "application/json").setResponseCode(200);
-				case "/actuator/health":
-					return new MockResponse().setBody("\"status\":\"UP\"}")
-							.addHeader("Content-Type", "application/json").setResponseCode(200);
-				case "/actuator/bindings":
-					return new MockResponse().setBody(resourceAsString("actuator-bindings.json"))
-							.addHeader("Content-Type", "application/json").setResponseCode(200);
-				case "/actuator/bindings/input":
-					if (recordedRequest.getMethod().equals("GET")) {
-						return new MockResponse().setBody(resourceAsString("actuator-binding-input.json"))
-								.addHeader("Content-Type", "application/json")
-								.setResponseCode(200);
-					}
-					else if (recordedRequest.getMethod().equals("POST")) {
-						if (!StringUtils.hasText(recordedRequest.getBody().toString())) {
-							return new MockResponse().setResponseCode(HttpStatus.BAD_REQUEST.value());
-						}
-						else {
-							return new MockResponse().setBody(recordedRequest.getBody())
-									.addHeader("Content-Type", "application/json").setResponseCode(200);
-						}
-					}
-					else {
-						return new MockResponse().setResponseCode(HttpStatus.BAD_REQUEST.value());
-					}
-				default:
-					return new MockResponse().setResponseCode(HttpStatus.NOT_FOUND.value());
-				}
-			}
-		});
+	private void setupMockServer() {
+		WireMock.stubFor(WireMock.get("/actuator/info")
+			.willReturn(WireMock.aResponse()
+				.withBody(resourceAsString("actuator-info.json"))
+				.withHeader("Content-Type", "application/json")
+				.withStatus(HttpStatus.OK.value())));
+		WireMock.stubFor(WireMock.get("/actuator/health")
+			.willReturn(WireMock.aResponse()
+				.withBody("\"status\":\"UP\"}")
+				.withHeader("Content-Type", "application/json")
+				.withStatus(HttpStatus.OK.value())));
+		WireMock.stubFor(WireMock.get("/actuator/bindings")
+			.willReturn(WireMock.aResponse()
+				.withBody(resourceAsString("actuator-bindings.json"))
+				.withHeader("Content-Type", "application/json")
+				.withStatus(HttpStatus.OK.value())));
+		WireMock.stubFor(WireMock.get("/actuator/bindings/input")
+			.willReturn(WireMock.aResponse()
+				.withBody(resourceAsString("actuator-binding-input.json"))
+				.withHeader("Content-Type", "application/json")
+				.withStatus(HttpStatus.OK.value())));
+		WireMock.stubFor(WireMock.post("/actuator/bindings/input")
+			.withRequestBody(new AbsentPattern(""))
+			.willReturn(WireMock.badRequest()));
+		WireMock.stubFor(WireMock.post("/actuator/bindings/input")
+			.withRequestBody(new NotPattern(new AbsentPattern("")))
+			.willReturn(WireMock.aResponse()
+				.withBody("{{request.body}}")
+				.withHeader("Content-Type", "application/json")
+				.withStatus(HttpStatus.OK.value())));
+		WireMock.stubFor(WireMock.any(WireMock.urlEqualTo("/actuator/bindings/input"))
+			.willReturn(WireMock.badRequest())
+			.atPriority(10));
+		WireMock.stubFor(WireMock.any(WireMock.anyUrl()).willReturn(WireMock.notFound()).atPriority(20));
 	}
 
-	@AfterAll
-	static void tearDown() throws IOException {
-		mockActuator.shutdown();
-	}
-
-	@Override
-	protected void postSetUp() {
+	@BeforeEach
+	void setupWiremockInfo() {
+		setupMockServer();
+		commonSetup();
 		this.actuatorOperations = new CloudFoundryActuatorTemplate(new RestTemplate(), this.deployer, new AppAdmin());
-		this.appBaseUrl = String.format("localhost:%s", mockActuator.getPort());
+		this.appBaseUrl = String.format("localhost:%s", wireMockExtension.getPort());
 		givenRequestGetApplication("test-application-id", Mono.just(ApplicationDetail.builder()
-				.diskQuota(0)
-				.id("test-application-id")
-				.instances(1)
-				.memoryLimit(0)
-				.name("test-application")
-				.requestedState("RUNNING")
-				.runningInstances(1)
-				.stack("test-stack")
-				.urls(appBaseUrl)
-				.instanceDetail(InstanceDetail.builder().state("RUNNING").index("1").build())
-				.build()));
+			.diskQuota(0)
+			.id("test-application-id")
+			.instances(1)
+			.memoryLimit(0)
+			.name("test-application")
+			.requestedState("RUNNING")
+			.runningInstances(1)
+			.stack("test-stack")
+			.urls(appBaseUrl)
+			.instanceDetail(InstanceDetail.builder().state("RUNNING").index("1").build())
+			.build()));
 	}
 
 	@Test

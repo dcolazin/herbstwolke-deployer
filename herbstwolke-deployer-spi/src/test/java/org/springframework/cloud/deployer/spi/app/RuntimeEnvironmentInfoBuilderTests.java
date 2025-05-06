@@ -16,14 +16,11 @@
 
 package org.springframework.cloud.deployer.spi.app;
 
-import org.junit.Test;
-
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.cloud.deployer.spi.core.RuntimeEnvironmentInfo;
 import org.springframework.cloud.deployer.spi.util.RuntimeVersionUtils;
 import org.springframework.core.SpringVersion;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
 /**
  * Tests for constructing a {@link RuntimeEnvironmentInfo}
@@ -42,16 +39,16 @@ public class RuntimeEnvironmentInfoBuilderTests {
 				.platformApiVersion("1")
 				.addPlatformSpecificInfo("foo", "bar")
 				.build();
-		assertThat(rei.getSpiVersion(), is(RuntimeVersionUtils.getVersion(AppDeployer.class)));
-		assertThat(rei.getImplementationName(), is("TestDeployer"));
-		assertThat(rei.getImplementationVersion(), is("1.0.0"));
-		assertThat(rei.getPlatformType(), is("Test"));
-		assertThat(rei.getPlatformApiVersion(), is("1"));
-		assertThat(rei.getPlatformClientVersion(), is("1.2.0"));
-		assertThat(rei.getPlatformHostVersion(), is("1.1.0"));
-		assertThat(rei.getJavaVersion(), is(System.getProperty("java.version")));
-		assertThat(rei.getSpringVersion(), is(SpringVersion.getVersion()));
-		assertThat(rei.getSpringBootVersion(), is(RuntimeVersionUtils.getSpringBootVersion()));
-		assertThat(rei.getPlatformSpecificInfo().get("foo"), is("bar"));
+		Assertions.assertEquals(RuntimeVersionUtils.getVersion(AppDeployer.class), rei.getSpiVersion());
+		Assertions.assertEquals("TestDeployer", rei.getImplementationName());
+		Assertions.assertEquals("1.0.0", rei.getImplementationVersion());
+		Assertions.assertEquals("Test", rei.getPlatformType());
+		Assertions.assertEquals("1", rei.getPlatformApiVersion());
+		Assertions.assertEquals("1.2.0", rei.getPlatformClientVersion());
+		Assertions.assertEquals("1.1.0", rei.getPlatformHostVersion());
+		Assertions.assertEquals(System.getProperty("java.version"), rei.getJavaVersion());
+		Assertions.assertEquals(SpringVersion.getVersion(), rei.getSpringVersion());
+		Assertions.assertEquals(RuntimeVersionUtils.getSpringBootVersion(), rei.getSpringBootVersion());
+		Assertions.assertEquals("bar", rei.getPlatformSpecificInfo().get("foo"));
 	}
 }

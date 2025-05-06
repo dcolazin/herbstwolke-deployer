@@ -17,12 +17,13 @@
 package org.springframework.cloud.deployer.spi.test;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.Properties;
 import java.util.UUID;
 
-import org.junit.Rule;
-import org.junit.rules.TestName;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +38,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
  * Abstract base class containing infrastructure for the TCK, common to both
@@ -50,21 +51,25 @@ import org.springframework.test.context.junit4.SpringRunner;
  * @author Eric Bottard
  */
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment= WebEnvironment.NONE)
 @ContextConfiguration(classes = AbstractIntegrationTests.Config.class)
 public abstract class AbstractIntegrationTests {
 
 	protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	@Rule
-	public TestName name = new TestName();
+	public String name = null;
+
+	@BeforeEach
+	void setupName(TestInfo testInfo) {
+		name = testInfo.getTestMethod().map(Method::getName).orElse("");
+	}
 
 	@Autowired
 	protected MavenProperties mavenProperties;
 
 	protected String randomName() {
-		return name.getMethodName() + "-" + UUID.randomUUID().toString();
+		return name + "-" + UUID.randomUUID();
 	}
 
 	/**

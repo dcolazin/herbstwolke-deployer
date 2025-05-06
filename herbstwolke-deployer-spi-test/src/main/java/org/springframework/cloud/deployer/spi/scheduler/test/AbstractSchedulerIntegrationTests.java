@@ -17,6 +17,7 @@
 package org.springframework.cloud.deployer.spi.scheduler.test;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,13 +29,13 @@ import java.util.UUID;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.rules.TestName;
-import org.junit.runner.RunWith;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,10 +59,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 /**
  * Contains base set of tests that are required for each implementation of
  * Spring Cloud Scheduler to pass.
@@ -69,7 +68,7 @@ import static org.junit.Assert.assertThat;
  * @author Glenn Renfro
  * @author Ilayaperumal Gopinathan
  */
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @ContextConfiguration(classes = AbstractSchedulerIntegrationTests.Config.class)
 public abstract class AbstractSchedulerIntegrationTests {
@@ -93,13 +92,9 @@ public abstract class AbstractSchedulerIntegrationTests {
 
 	protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	@Rule
-	public TestName name = new TestName();
+	public String name = "";
 
-	@Rule
-	public ExpectedException expectedException = ExpectedException.none();
-
-	@After
+	@AfterEach
 	public void tearDown() {
 		List<ScheduleRequest> scheduleRequests = new ArrayList<>(schedulerWrapper.getScheduledTasks().values());
 
@@ -155,9 +150,10 @@ public abstract class AbstractSchedulerIntegrationTests {
 	 */
 	protected abstract Map<String, String> getAppProperties();
 
-	@Before
-	public void wrapScheduler() {
+	@BeforeEach
+	public void wrapScheduler(TestInfo testInfo) {
 		this.schedulerWrapper = new SchedulerWrapper(provideScheduler());
+		this.name = testInfo.getTestMethod().map(Method::getName).orElse("");
 	}
 
 	@Test
@@ -170,7 +166,7 @@ public abstract class AbstractSchedulerIntegrationTests {
 		int initialSize = taskScheduler().list().size();
 		ScheduleInfo scheduleInfo = createAndVerifySchedule();
 		unscheduleTestSchedule(scheduleInfo.getScheduleName());
-		assertEquals(0, taskScheduler().list().size() - initialSize);
+		Assertions.assertEquals(0, taskScheduler().list().size() - initialSize);
 	}
 
 	@Test
@@ -180,11 +176,10 @@ public abstract class AbstractSchedulerIntegrationTests {
 		ScheduleInfo scheduleInfo = new ScheduleInfo();
 		scheduleInfo.setScheduleName(request.getScheduleName());
 
-		this.expectedException.expect(CreateScheduleException.class);
-		this.expectedException.expectMessage(String.format("Failed to create schedule %s", request.getScheduleName()));
-
 		verifySchedule(scheduleInfo);
-		taskScheduler().schedule(request);
+		CreateScheduleException exception = Assertions.assertThrows(CreateScheduleException.class,
+			() -> taskScheduler().schedule(request));
+		Assertions.assertEquals(String.format("Failed to create schedule %s", request.getScheduleName()), exception.getMessage());
 	}
 
 	@Test
@@ -192,10 +187,9 @@ public abstract class AbstractSchedulerIntegrationTests {
 		String definitionName = randomName();
 		String scheduleName = scheduleName() + definitionName;
 
-		this.expectedException.expect(SchedulerException.class);
-		this.expectedException.expectMessage(String.format("Failed to unschedule schedule %s does not exist.",
-				scheduleName));
-		unscheduleTestSchedule(scheduleName);
+		SchedulerException exception = Assertions.assertThrows(SchedulerException.class,
+			() -> unscheduleTestSchedule(scheduleName));
+		Assertions.assertEquals(String.format("Failed to unschedule schedule %s does not exist.", scheduleName), exception.getMessage());
 	}
 
 	@Test
@@ -207,9 +201,8 @@ public abstract class AbstractSchedulerIntegrationTests {
 		properties.put(SchedulerPropertyKeys.CRON_EXPRESSION, INVALID_EXPRESSION);
 		AppDefinition definition = new AppDefinition(definitionName, properties);
 		ScheduleRequest request = new ScheduleRequest(definition, properties, getCommandLineArgs(), scheduleName, testApplication());
-		this.expectedException.expect(CreateScheduleException.class);
 
-		taskScheduler().schedule(request);
+		Assertions.assertThrows(CreateScheduleException.class, () -> taskScheduler().schedule(request));
 	}
 
 	@Test
@@ -238,7 +231,7 @@ public abstract class AbstractSchedulerIntegrationTests {
 		ScheduleInfo scheduleInfo = new ScheduleInfo();
 		scheduleInfo.setScheduleName(scheduleName+0);
 		scheduleInfo.setTaskDefinitionName(definitionName+0);
-		assertThat(scheduleInfo, EventuallyMatcher.eventually(
+		MatcherAssert.assertThat(scheduleInfo, EventuallyMatcher.eventually(
 				hasSpecifiedSchedulesByTaskDefinitionName(taskScheduler().list(definitionName+0),
 						scheduleInfo.getTaskDefinitionName(), 2),
 				this.scheduleTimeout.maxAttempts, this.scheduleTimeout.pause));
@@ -281,7 +274,7 @@ public abstract class AbstractSchedulerIntegrationTests {
 	}
 
 	private void verifySchedule(ScheduleInfo scheduleInfo) {
-		assertThat(scheduleInfo, EventuallyMatcher.eventually(hasSpecifiedSchedule(taskScheduler().list(),
+		MatcherAssert.assertThat(scheduleInfo, EventuallyMatcher.eventually(hasSpecifiedSchedule(taskScheduler().list(),
 				scheduleInfo.getScheduleName()), this.scheduleTimeout.maxAttempts,
 				this.scheduleTimeout.pause));
 	}
@@ -293,14 +286,14 @@ public abstract class AbstractSchedulerIntegrationTests {
 
 		ScheduleInfo scheduleInfo = new ScheduleInfo();
 		scheduleInfo.setScheduleName(scheduleName);
-		assertThat(scheduleInfo, EventuallyMatcher.eventually(specifiedScheduleNotPresent(
+		MatcherAssert.assertThat(scheduleInfo, EventuallyMatcher.eventually(specifiedScheduleNotPresent(
 				taskScheduler().list(), scheduleName),
 				this.unScheduleTimeout.maxAttempts, this.unScheduleTimeout.pause));
 
 	}
 
 	protected String randomName() {
-		return name.getMethodName() + "-" + UUID.randomUUID().toString();
+		return name + "-" + UUID.randomUUID();
 	}
 
 	protected String scheduleName() {
@@ -413,7 +406,7 @@ public abstract class AbstractSchedulerIntegrationTests {
 	}
 
 	/**
-	 * Return a resource corresponding to the spring-cloud-deployer-spi-scheduler-test-app app suitable for the target runtime.
+	 * Return a resource corresponding to the herbstwolke-deployer-spi-scheduler-test-app app suitable for the target runtime.
 	 *
 	 * The default implementation returns an uber-jar fetched via Maven. Subclasses may override.
 	 */
@@ -423,11 +416,11 @@ public abstract class AbstractSchedulerIntegrationTests {
 			properties.load(new ClassPathResource("integration-test-app.properties").getInputStream());
 		}
 		catch (IOException e) {
-			throw new RuntimeException("Failed to determine which version of spring-cloud-deployer-spi-scheduler-test-app to use", e);
+			throw new RuntimeException("Failed to determine which version of herbstwolke-deployer-spi-scheduler-test-app to use", e);
 		}
 		return new MavenResource.Builder(mavenProperties)
 				.groupId("org.springframework.cloud")
-				.artifactId("spring-cloud-deployer-spi-scheduler-test-app")
+				.artifactId("herbstwolke-deployer-spi-scheduler-test-app")
 				.classifier("exec")
 				.version(properties.getProperty("version"))
 				.extension("jar")

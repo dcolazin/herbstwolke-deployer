@@ -148,7 +148,7 @@ public class KubernetesSchedulerIT extends AbstractSchedulerIntegrationJUnit5Tes
 	}
 
 	protected Resource testApplication() {
-		return new DockerResource("springcloud/spring-cloud-deployer-spi-scheduler-test-app:latest");
+		return new DockerResource("springcloud/herbstwolke-deployer-spi-scheduler-test-app:latest");
 	}
 
 	@Test

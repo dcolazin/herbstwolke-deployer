@@ -16,13 +16,11 @@
 
 package org.springframework.cloud.deployer.resource.docker;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
-
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Tests for the {@link DockerResource}.
@@ -34,19 +32,19 @@ public class DockerResourceTests {
 	String image = "sringcloud/hello-kube:latest";
 
 	@Test
-	public void testResource() throws IOException, URISyntaxException {
+	public void testResource() throws IOException {
 		DockerResource r = new DockerResource(image);
-		assertEquals(image, r.getURI().getSchemeSpecificPart());
+		Assertions.assertEquals(image, r.getURI().getSchemeSpecificPart());
 	}
 
 	@Test
-	public void testUri() throws IOException, URISyntaxException {
+	public void testUri() throws IOException {
 		DockerResource r = new DockerResource(URI.create(DockerResource.URI_SCHEME + ":" + image));
-		assertEquals(image, r.getURI().getSchemeSpecificPart());
+		Assertions.assertEquals(image, r.getURI().getSchemeSpecificPart());
 	}
 
-	@Test(expected=IllegalArgumentException.class)
-	public void testInvalidUri() throws IOException, URISyntaxException {
-		DockerResource r = new DockerResource(URI.create("http:" + image));
+	@Test
+	public void testInvalidUri() {
+		Assertions.assertThrows(IllegalArgumentException.class, () -> new DockerResource(URI.create("http:" + image)));
 	}
 }

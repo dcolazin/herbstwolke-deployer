@@ -16,13 +16,10 @@
 
 package org.springframework.cloud.deployer.spi.task;
 
-import org.junit.Test;
-
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.cloud.deployer.spi.core.AppDeploymentRequest;
 import org.springframework.cloud.deployer.spi.core.RuntimeEnvironmentInfo;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
  * Tests for {@link TaskLauncher}
@@ -63,26 +60,15 @@ public class TaskLauncherTests {
 				return null;
 			}
 		};
-		try {
-			taskLauncher.getLog("test");
-			fail();
-		}
-		catch (UnsupportedOperationException e) {
-			assertEquals(e.getMessage(), "'getLog' is not implemented.");
-		}
-		try {
-			taskLauncher.getRunningTaskExecutionCount();
-			fail();
-		}
-		catch (UnsupportedOperationException e) {
-			assertEquals(e.getMessage(), "'getRunningTaskExecutionCount' is not implemented.");
-		}
-		try {
-			taskLauncher.getMaximumConcurrentTasks();
-			fail();
-		}
-		catch (UnsupportedOperationException e) {
-			assertEquals(e.getMessage(), "'getMaximumConcurrentTasks' is not implemented.");
-		}
+
+		UnsupportedOperationException e = Assertions.assertThrows(UnsupportedOperationException.class,
+			() -> taskLauncher.getLog("test"));
+		Assertions.assertEquals("'getLog' is not implemented.", e.getMessage());
+
+		e = Assertions.assertThrows(UnsupportedOperationException.class, taskLauncher::getRunningTaskExecutionCount);
+		Assertions.assertEquals("'getRunningTaskExecutionCount' is not implemented.", e.getMessage());
+
+		e = Assertions.assertThrows(UnsupportedOperationException.class, taskLauncher::getMaximumConcurrentTasks);
+		Assertions.assertEquals("'getMaximumConcurrentTasks' is not implemented.", e.getMessage());
 	}
 }

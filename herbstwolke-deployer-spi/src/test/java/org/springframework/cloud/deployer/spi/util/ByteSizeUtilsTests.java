@@ -15,10 +15,8 @@
  */
 package org.springframework.cloud.deployer.spi.util;
 
-import org.hamcrest.CoreMatchers;
-import org.junit.Test;
-
-import static org.junit.Assert.assertThat;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for {@link ByteSizeUtils}.
@@ -29,21 +27,17 @@ public class ByteSizeUtilsTests {
 
 	@Test
 	public void testParse() {
-		assertThat(ByteSizeUtils.parseToMebibytes("1"), CoreMatchers.is(1L));
-		assertThat(ByteSizeUtils.parseToMebibytes("2m"), CoreMatchers.is(2L));
-		assertThat(ByteSizeUtils.parseToMebibytes("20M"), CoreMatchers.is(20L));
-		assertThat(ByteSizeUtils.parseToMebibytes("1000g"), CoreMatchers.is(1024_000L));
-		assertThat(ByteSizeUtils.parseToMebibytes("1G"), CoreMatchers.is(1024L));
+		Assertions.assertEquals(1L, ByteSizeUtils.parseToMebibytes("1"));
+		Assertions.assertEquals(2L, ByteSizeUtils.parseToMebibytes("2m"));
+		Assertions.assertEquals(20L, ByteSizeUtils.parseToMebibytes("20M"));
+		Assertions.assertEquals(1024_000L, ByteSizeUtils.parseToMebibytes("1000g"));
+		Assertions.assertEquals(1024L, ByteSizeUtils.parseToMebibytes("1G"));
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testNotANumber() {
-		ByteSizeUtils.parseToMebibytes("wat?124");
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void testUnsupportedUnit() {
-		ByteSizeUtils.parseToMebibytes("1PB");
+	@Test
+	public void illegalArgumentTest() {
+		Assertions.assertThrows(IllegalArgumentException.class, () -> ByteSizeUtils.parseToMebibytes("wat?124"));
+		Assertions.assertThrows(IllegalArgumentException.class, () -> ByteSizeUtils.parseToMebibytes("1PB"));
 	}
 
 }

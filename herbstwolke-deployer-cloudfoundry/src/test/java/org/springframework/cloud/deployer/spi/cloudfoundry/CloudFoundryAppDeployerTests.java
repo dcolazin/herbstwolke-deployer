@@ -35,6 +35,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
 import org.apache.commons.compress.utils.Sets;
 import org.assertj.core.data.MapEntry;
 import org.cloudfoundry.client.v2.ClientV2Exception;
@@ -48,6 +49,7 @@ import org.cloudfoundry.operations.applications.Route;
 import org.cloudfoundry.operations.applications.StartApplicationRequest;
 import org.cloudfoundry.operations.services.BindServiceInstanceRequest;
 import org.cloudfoundry.util.FluentMap;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import reactor.core.publisher.Mono;
@@ -85,13 +87,15 @@ public class CloudFoundryAppDeployerTests extends AbstractAppDeployerTestSupport
 	@TempDir
 	public Path folder;
 
-	@Override
-	protected void postSetUp() {
+	@BeforeEach
+	void setup() {
+		commonSetup();
 		this.deploymentProperties.setServices(new HashSet<>(Arrays.asList("test-service-1", "test-service-2")));
 		this.deploymentProperties.setEnv(Collections.singletonMap("SOME_GLOBAL_PROPERTY", "someGlobalValue"));
 		this.deploymentProperties.getAppAdmin().setUser("user");
 		this.deploymentProperties.getAppAdmin().setPassword("password");
 	}
+
 
 	@SuppressWarnings("unchecked")
 	@Test

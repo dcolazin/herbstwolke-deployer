@@ -16,13 +16,10 @@
 
 package org.springframework.cloud.deployer.spi.app;
 
-import org.junit.Test;
-
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.cloud.deployer.spi.core.AppDeploymentRequest;
 import org.springframework.cloud.deployer.spi.core.RuntimeEnvironmentInfo;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
  * Tests for {@link AppDeployer}
@@ -56,13 +53,9 @@ public class AppDeployerTests {
 
 			}
 		};
-		try {
-			customAppDeployer.getLog("test");
-			fail();
-		}
-		catch (UnsupportedOperationException e) {
-			assertEquals(e.getMessage(), "'getLog' is not implemented.");
-		}
+		UnsupportedOperationException e = Assertions.assertThrows(UnsupportedOperationException.class,
+			() -> customAppDeployer.getLog("test"));
+		Assertions.assertEquals("'getLog' is not implemented.", e.getMessage());
 
 	}
 }

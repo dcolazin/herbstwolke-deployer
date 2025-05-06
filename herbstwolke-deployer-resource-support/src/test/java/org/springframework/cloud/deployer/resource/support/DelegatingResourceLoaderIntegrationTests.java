@@ -17,13 +17,9 @@ package org.springframework.cloud.deployer.resource.support;
 
 import java.io.File;
 
-import org.junit.Test;
-
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.io.Resource;
-
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
 /**
  * @author Mark Pollack
@@ -36,6 +32,6 @@ public class DelegatingResourceLoaderIntegrationTests {
 		Resource resource = delegatingResourceLoader.getResource("https://repo1.maven.org/maven2/org/springframework/cloud/stream/app/file-sink-rabbit/3.2.1/file-sink-rabbit-3.2.1.jar");
 		File file1 = resource.getFile();
 		File file2 = resource.getFile();
-		assertThat(file1, is(equalTo(file2)));
+		Assertions.assertEquals(file1, file2);
 	}
 }

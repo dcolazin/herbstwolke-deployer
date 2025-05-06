@@ -18,11 +18,9 @@ package org.springframework.cloud.deployer.resource.docker;
 
 import java.io.IOException;
 
-import org.junit.Test;
-
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.io.Resource;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Tests for the {@link DockerResourceLoader}.
@@ -36,11 +34,11 @@ public class DockerResourceLoaderTests {
 		String location = "docker:springcloud/test-app:v1";
 		DockerResourceLoader loader = new DockerResourceLoader();
 		Resource resource = loader.getResource(location);
-		assertEquals(DockerResource.class, resource.getClass());
+		Assertions.assertEquals(DockerResource.class, resource.getClass());
 		DockerResource dockerResource = (DockerResource) resource;
-		assertEquals(location, dockerResource.getURI().toString());
-		assertEquals("springcloud/test-app:v1", dockerResource.getURI().getSchemeSpecificPart());
-		assertEquals("docker", dockerResource.getURI().getScheme().toString());
+		Assertions.assertEquals(location, dockerResource.getURI().toString());
+		Assertions.assertEquals("springcloud/test-app:v1", dockerResource.getURI().getSchemeSpecificPart());
+		Assertions.assertEquals("docker", dockerResource.getURI().getScheme());
 	}
 
 	@Test
@@ -48,11 +46,11 @@ public class DockerResourceLoaderTests {
 		String location = "docker://springcloud/test-app:v1";
 		DockerResourceLoader loader = new DockerResourceLoader();
 		Resource resource = loader.getResource(location);
-		assertEquals(DockerResource.class, resource.getClass());
+		Assertions.assertEquals(DockerResource.class, resource.getClass());
 		DockerResource dockerResource = (DockerResource) resource;
-		assertEquals("docker:springcloud/test-app:v1", dockerResource.getURI().toString());
-		assertEquals("springcloud/test-app:v1", dockerResource.getURI().getSchemeSpecificPart());
-		assertEquals("docker", dockerResource.getURI().getScheme().toString());
+		Assertions.assertEquals("docker:springcloud/test-app:v1", dockerResource.getURI().toString());
+		Assertions.assertEquals("springcloud/test-app:v1", dockerResource.getURI().getSchemeSpecificPart());
+		Assertions.assertEquals("docker", dockerResource.getURI().getScheme());
 	}
 
 	@Test
@@ -60,11 +58,11 @@ public class DockerResourceLoaderTests {
 		String location = "springcloud/test-app:v1";
 		DockerResourceLoader loader = new DockerResourceLoader();
 		Resource resource = loader.getResource(location);
-		assertEquals(DockerResource.class, resource.getClass());
+		Assertions.assertEquals(DockerResource.class, resource.getClass());
 		DockerResource dockerResource = (DockerResource) resource;
-		assertEquals(DockerResource.URI_SCHEME + ":" + location, dockerResource.getURI().toString());
-		assertEquals("springcloud/test-app:v1", dockerResource.getURI().getSchemeSpecificPart());
-		assertEquals("docker", dockerResource.getURI().getScheme().toString());
+		Assertions.assertEquals(DockerResource.URI_SCHEME + ":" + location, dockerResource.getURI().toString());
+		Assertions.assertEquals("springcloud/test-app:v1", dockerResource.getURI().getSchemeSpecificPart());
+		Assertions.assertEquals("docker", dockerResource.getURI().getScheme());
 	}
 
 }
